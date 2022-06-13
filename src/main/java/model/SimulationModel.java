@@ -1,6 +1,5 @@
-package concurrent;
+package model;
 
-import concurrent.WithGui.ModelObserver;
 import lib.Body;
 import lib.Boundary;
 import lib.P2d;

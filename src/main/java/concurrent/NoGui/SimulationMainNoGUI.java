@@ -1,8 +1,8 @@
 package concurrent.NoGui;
 
 import lib.Boundary;
-import concurrent.SimulationController;
-import concurrent.SimulationModel;
+import controller.SimulationController;
+import model.SimulationModel;
 
 /**
  * Bodies simulation - legacy code: sequential, unstructured

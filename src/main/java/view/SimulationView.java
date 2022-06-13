@@ -1,7 +1,8 @@
-package concurrent.WithGui;
+package view;
 
-import concurrent.SimulationController;
-import concurrent.SimulationModel;
+import controller.SimulationController;
+import model.ModelObserver;
+import model.SimulationModel;
 import lib.Body;
 import lib.Boundary;
 import lib.P2d;

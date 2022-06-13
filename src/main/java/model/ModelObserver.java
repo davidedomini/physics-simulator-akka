@@ -1,6 +1,4 @@
-package concurrent.WithGui;
-
-import concurrent.SimulationModel;
+package model;
 
 public interface ModelObserver {
 

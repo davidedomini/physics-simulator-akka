@@ -1,6 +1,8 @@
-package concurrent;
+package controller;
 
-import concurrent.WithGui.StopFlag;
+import concurrent.Master;
+import lib.StopFlag;
+import model.SimulationModel;
 
 public class SimulationController {
 

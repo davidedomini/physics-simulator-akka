@@ -1,6 +1,7 @@
 package concurrent;
 
-import concurrent.WithGui.StopFlag;
+import lib.StopFlag;
+import model.SimulationModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;

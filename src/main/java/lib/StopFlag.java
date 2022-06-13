@@ -1,4 +1,4 @@
-package concurrent.WithGui;
+package lib;
 
 public class StopFlag {
 

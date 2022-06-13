@@ -1,8 +1,9 @@
 package concurrent.WithGui;
 
-import concurrent.SimulationController;
-import concurrent.SimulationModel;
+import controller.SimulationController;
+import model.SimulationModel;
 import lib.Boundary;
+import view.SimulationView;
 
 public class SimulationMainWithGui {
 
