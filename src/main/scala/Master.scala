@@ -9,7 +9,7 @@ object Master:
   enum Command:
     case Start
     case Stop
-    case VelocitiesUpdated
+    case VelocitiesUpdated(result: TaskResult)
     case PositionsUpdated
   export Command.*
 
@@ -34,7 +34,9 @@ object Master:
               yield w ! WorkerActor.UpdateVelocities(Task(new ArrayList(model.getBodies), start, bodiesForWorker), context.self)
             Behaviors.same
           case Stop => Behaviors.stopped
-          case VelocitiesUpdated => Behaviors.same
+          case VelocitiesUpdated(result) => 
+            println("Velocità aggiornate ricevute")
+            Behaviors.same
           case PositionsUpdated => Behaviors.same
         }
     }
