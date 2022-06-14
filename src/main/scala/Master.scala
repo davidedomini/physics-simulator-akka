@@ -1,3 +1,6 @@
+import akka.actor.typed.{ActorSystem, Behavior, Signal, ActorRef}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
+
 object Master:
 
   enum Command:
@@ -7,5 +10,14 @@ object Master:
     case PositionsUpdated
   export Command.*
 
-
+  def apply(): Behavior[Command] =
+    Behaviors.receive {
+      (context, msg) =>
+        msg match {
+          case Start => ???
+          case Stop => Behaviors.stopped
+          case VelocitiesUpdated => ???
+          case PositionsUpdated => ???
+        }
+    }
 
