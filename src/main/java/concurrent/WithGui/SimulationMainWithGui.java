@@ -14,7 +14,7 @@ public class SimulationMainWithGui {
         long totalIter = 1000;
         int nBodies = 1000;
 
-        SimulationModel simModel = new SimulationModel(nBodies, bounds, totalIter);
+        SimulationModel simModel = new SimulationModel(nBodies, totalIter);
 
         int nWorkers = Runtime.getRuntime().availableProcessors() + 1;
         System.out.println("CPU: " + nWorkers);

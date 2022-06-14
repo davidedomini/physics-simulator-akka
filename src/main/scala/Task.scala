@@ -1,7 +1,7 @@
 import java.util.ArrayList
 import lib.Body
 
-class Task (private var bodies: ArrayList[Body], private var start: Int, private var stop: Int):
+class Task (private var bodies: ArrayList[Body], private var start: Int, private var bodiesForWorker: Int):
  def getBodies = bodies
  def getStart = start
- def getStop = stop
+ def getBodiesForWorker = bodiesForWorker

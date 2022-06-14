@@ -22,8 +22,8 @@ public class SimulationModel {
     /* virtual time step */
     private double dt = 0.001;
 
-    public SimulationModel(final int nBodies, final Boundary bounds, final long totalIter){
-        this.bounds = bounds;
+    public SimulationModel(final int nBodies, final long totalIter){
+        this.bounds = new Boundary(-6.0, -6.0, 6.0, 6.0);;
         this.nBodies = nBodies;
         this.observers = new ArrayList<>();
         this.totalIter = totalIter;
