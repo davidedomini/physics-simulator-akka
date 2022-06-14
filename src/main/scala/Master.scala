@@ -10,11 +10,19 @@ object Master:
     case PositionsUpdated
   export Command.*
 
-  def apply(): Behavior[Command] =
+  def apply(nWorkers: Int, nBodies: Int): Behavior[Command] =
+    
+    var workers = Seq.empty[ActorRef[Worker.Command]]
+    
     Behaviors.receive {
       (context, msg) =>
         msg match {
-          case Start => ???
+          case Start => 
+            workers = 
+              for 
+                i <- 1 to nWorkers
+              yield  context.spawn(Worker(), "Worker" + i)
+            Behaviors.same
           case Stop => Behaviors.stopped
           case VelocitiesUpdated => ???
           case PositionsUpdated => ???
