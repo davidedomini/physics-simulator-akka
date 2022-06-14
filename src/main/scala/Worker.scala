@@ -4,3 +4,4 @@ object Worker:
     case UpdateVelocities
     case UpdatePositions
     case Stop
+  export Command.*
