@@ -12,7 +12,6 @@ import java.util.Random;
 public class SimulationModel {
 
     private List<Body> bodies;
-    private List<ModelObserver> observers;
     private Boundary bounds;
     private long totalIter;
     private long iter;
@@ -25,7 +24,6 @@ public class SimulationModel {
     public SimulationModel(final int nBodies, final long totalIter){
         this.bounds = new Boundary(-6.0, -6.0, 6.0, 6.0);
         this.nBodies = nBodies;
-        this.observers = new ArrayList<>();
         this.totalIter = totalIter;
         this.iter = 0;
     }
@@ -42,20 +40,9 @@ public class SimulationModel {
         }
     }
 
-    public void update(){
-        //Notifica gli observer
-        notifyObservers();
-    }
-
     public void updateVirtualTime(){
         vt = vt + dt;
         iter++;
-    }
-
-    public void reset(){
-        this.iter = 0;
-        this.vt = 0;
-//        this.init();
     }
 
     public long getTotalIter() {
@@ -86,17 +73,8 @@ public class SimulationModel {
 
     public double getDt() { return dt;}
 
-    public void addObserver(ModelObserver obs){
-        observers.add(obs);
-    }
-
     public void setBodies(ArrayList newBodies){
         this.bodies = new ArrayList<>(newBodies);
     }
-    
-    private void notifyObservers(){
-        for (ModelObserver obs: observers){
-            obs.modelUpdated(this);
-        }
-    }
+
 }
