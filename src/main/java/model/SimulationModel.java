@@ -23,7 +23,7 @@ public class SimulationModel {
     private double dt = 0.001;
 
     public SimulationModel(final int nBodies, final long totalIter){
-        this.bounds = new Boundary(-6.0, -6.0, 6.0, 6.0);;
+        this.bounds = new Boundary(-6.0, -6.0, 6.0, 6.0);
         this.nBodies = nBodies;
         this.observers = new ArrayList<>();
         this.totalIter = totalIter;
@@ -90,6 +90,10 @@ public class SimulationModel {
         observers.add(obs);
     }
 
+    public void setBodies(ArrayList newBodies){
+        this.bodies = new ArrayList<>(newBodies);
+    }
+    
     private void notifyObservers(){
         for (ModelObserver obs: observers){
             obs.modelUpdated(this);

@@ -1,6 +1,7 @@
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Signal}
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
-import lib.V2d
+import lib.{Boundary, V2d}
+
 import java.util.ArrayList
 
 object WorkerActor:
@@ -15,19 +16,29 @@ object WorkerActor:
       (context, msg) =>
         msg match {
           case UpdateVelocities(task, replyTo) =>
-            val stop = task.getStart+task.getBodiesForWorker
-            for 
-              i <- task.getStart to stop
-              if i < task.getBodies.size()
-              b = task.getBodies.get(i)
-              totalForce = Utility.computeTotalForceOnBody(b, task.getBodies)
+            val stop = task.start + task.bodiesForWorker
+            for
+              i <- task.start to stop
+              if i < task.bodies.size()
+              b = task.bodies.get(i)
+              totalForce = Utility.computeTotalForceOnBody(b, task.bodies)
               acc = new V2d(totalForce).scalarMul(1.0 / b.getMass)
             yield b.updateVelocity(acc, 0.01)
-            replyTo ! Master.Command.VelocitiesUpdated(TaskResult(new ArrayList(task.getBodies.subList(task.getStart, stop))))
+            replyTo ! Master.Command.VelocitiesUpdated(TaskResult(new ArrayList(task.bodies.subList(task.start, stop))))
             Behaviors.same
-          case UpdatePositions(task, replyTo) => Behaviors.same
+          case UpdatePositions(task, replyTo) =>
+            val stop = task.start + task.bodiesForWorker
+            for
+              i <- task.start to stop
+              if i < task.bodies.size()
+              b = task.bodies.get(i)
+            do 
+              b.updatePos(0.01)
+              b.checkAndSolveBoundaryCollision(task.bounds)
+
+            replyTo ! Master.Command.PositionsUpdated(TaskResult(new ArrayList(task.bodies.subList(task.start, stop))))
+            Behaviors.same
           case Stop =>
-            println("Mi è arrivato uno stop")
             Behaviors.stopped
         }
     }

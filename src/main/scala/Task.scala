@@ -1,7 +1,5 @@
 import java.util.ArrayList
 import lib.Body
+import lib.Boundary
 
-class Task (private var bodies: ArrayList[Body], private var start: Int, private var bodiesForWorker: Int):
- def getBodies = bodies
- def getStart = start
- def getBodiesForWorker = bodiesForWorker
+case class Task(bodies: ArrayList[Body], start: Int,bodiesForWorker: Int, bounds: Boundary)

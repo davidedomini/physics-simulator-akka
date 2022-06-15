@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import javax.swing.*;
+import akka.actor.ActorRef;
 
 /**
  * Simulation view
@@ -31,10 +32,22 @@ public class SimulationView implements ModelObserver {
     public SimulationView(int w, int h, SimulationController controller){
     	frame = new VisualiserFrame(w,h, controller);
     }
+	
+	public SimulationView(int w, int h){
+		frame = new VisualiserFrame(w,h);
+	}
 
 	@Override
 	public void modelUpdated(SimulationModel model) {
 		frame.display((ArrayList<Body>) model.getBodies(), model.getVt(), model.getIter(), model.getBounds());
+	}
+
+	public JButton getStop(){
+		return this.frame.getStopButton();
+	}
+
+	public JButton getStart(){
+		return this.frame.getStartButton();
 	}
 
 	public static class VisualiserFrame extends JFrame implements ActionListener {
@@ -43,6 +56,52 @@ public class SimulationView implements ModelObserver {
 		private JButton startButton;
 		private JButton stopButton;
 		private SimulationController controller;
+
+		public JButton getStartButton(){
+			return this.startButton;
+		}
+		public JButton getStopButton(){
+			return this.stopButton;
+		}
+
+		public VisualiserFrame(int w, int h){
+			setTitle("Bodies Simulation");
+			setSize(w+200,h+200);
+			setResizable(false);
+			panelBodies = new VisualiserPanel(w,h);
+			getContentPane().add(panelBodies);
+			addWindowListener(new WindowAdapter(){
+				public void windowClosing(WindowEvent ev){
+					System.exit(-1);
+				}
+				public void windowClosed(WindowEvent ev){
+					System.exit(-1);
+				}
+			});
+
+			//Start button
+			JPanel buttonsPanel = new JPanel();
+			buttonsPanel.setSize(100, 50);
+			this.startButton = new JButton("Start");
+			this.stopButton = new JButton("Stop");
+			buttonsPanel.add(this.startButton);
+			buttonsPanel.add(this.stopButton);
+
+			this.stopButton.addActionListener(this);
+			this.startButton.addActionListener(this);
+			startButton.setEnabled(false);
+
+			JPanel mainPanel = new JPanel();
+			LayoutManager layout = new BorderLayout();
+			mainPanel.setLayout(layout);
+			mainPanel.add(BorderLayout.CENTER,panelBodies);
+			mainPanel.add(BorderLayout.SOUTH,buttonsPanel);
+			setContentPane(mainPanel);
+
+			setLocationRelativeTo(null);
+			this.setVisible(true);
+		}
+		
 
         public VisualiserFrame(int w, int h, SimulationController controller){
 			this.controller = controller;
@@ -98,7 +157,7 @@ public class SimulationView implements ModelObserver {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(e.getSource() == this.stopButton){
+			/*if(e.getSource() == this.stopButton){
 				controller.stop();
 				stopButton.setEnabled(false);
 				startButton.setEnabled(true);
@@ -108,7 +167,7 @@ public class SimulationView implements ModelObserver {
 				startButton.setEnabled(false);
 				startButton.transferFocus();
 				stopButton.transferFocus();
-			}
+			}*/
 		}
 	}
 

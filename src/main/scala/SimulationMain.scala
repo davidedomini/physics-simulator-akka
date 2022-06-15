@@ -2,5 +2,6 @@ import akka.actor.typed.ActorSystem
 
 object SimulationMain extends App:
   println("Starting the simulation....")
-  val system = ActorSystem(Master(10, 100, 10), "master")
-  system ! Master.Command.Start
+  val system = ActorSystem(ViewActor(SimulationParams(10, 5000, 1000)), "view")
+  system ! ViewActor.Command.Start
+
