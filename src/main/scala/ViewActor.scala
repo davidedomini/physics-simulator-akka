@@ -24,7 +24,7 @@ object ViewActor:
         msg match{
           case Start =>
             view = Option(ViewWrapper(620, 620, context.self))
-            master = Option(context.spawn(Master(params.nWorkers, params.nBodies, params.nIter, Option(context.self)),  "master"))
+            master = Option(context.spawn(Master(params.nWorkers, params.nBodies, params.nIter, Option(context.self), false),  "master"))
             master.get ! Master.Command.Start
             Behaviors.same
           case UpdateView(model, replyTo) =>
@@ -35,7 +35,7 @@ object ViewActor:
             master.get ! Master.Command.Stop
             Behaviors.same
           case Restart =>
-            master = Option(context.spawn(Master(params.nWorkers, params.nBodies, params.nIter, Option(context.self)),  "master"))
+            master = Option(context.spawn(Master(params.nWorkers, params.nBodies, params.nIter, Option(context.self), false),  "master"))
             master.get ! Master.Command.Start
             Behaviors.same
         }

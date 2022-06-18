@@ -16,7 +16,7 @@ object Master:
     case ViewUpdated
   export Command.*
 
-  def apply(nWorkers: Int, nBodies: Int, totalIter: Int, view: Option[ActorRef[ViewActor.Command]]): Behavior[Command] =
+  def apply(nWorkers: Int, nBodies: Int, totalIter: Int, view: Option[ActorRef[ViewActor.Command]], timer: Boolean): Behavior[Command] =
 
     var workers = Seq.empty[ActorRef[WorkerActor.Command]]
     val model: SimulationModel = new SimulationModel(nBodies, totalIter);
@@ -24,7 +24,8 @@ object Master:
     var numberOfUpdatedVelocities = 0
     var numberOfUpdatedPositions = 0
     val newBodies = new ArrayList[Body]()
-
+    val chrono = Chrono()
+    
     Behaviors.receive {
       (context, msg) =>
         msg match {
@@ -33,6 +34,7 @@ object Master:
             workers = for{
                 i <- 1 to nWorkers
             } yield  context.spawn(WorkerActor(), "Worker" + i)
+            if timer then chrono.start()
             for
               w <- workers
               i = workers.indexOf(w)
@@ -61,7 +63,6 @@ object Master:
             numberOfUpdatedVelocities = numberOfUpdatedVelocities + 1
             newBodies.addAll(result.bodies)
             if(numberOfUpdatedVelocities == nWorkers) then
-              println("velocità aggiornate")
               numberOfUpdatedVelocities = 0
               model.setBodies(newBodies)
               newBodies.clear()
@@ -75,7 +76,6 @@ object Master:
             numberOfUpdatedPositions = numberOfUpdatedPositions + 1
             newBodies.addAll(result.bodies)
             if(numberOfUpdatedPositions == nWorkers) then
-              println("posizioni aggiornate")
               numberOfUpdatedPositions = 0
               model.setBodies(newBodies)
               newBodies.clear()
@@ -84,6 +84,14 @@ object Master:
                 model.updateVirtualTime()
               else
                 model.updateVirtualTime()
+                if(model.getIter == totalIter) {
+                  for
+                    w <- workers
+                  yield w ! WorkerActor.Command.Stop
+                  val time = chrono.stop()
+                  println("Simulation time:" + time + " ms")
+                  Behaviors.stopped
+                }
                 for
                   w <- workers
                   i = workers.indexOf(w)
