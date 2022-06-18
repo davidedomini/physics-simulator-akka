@@ -16,7 +16,7 @@ object Master:
     case ViewUpdated
   export Command.*
 
-  def apply(nWorkers: Int, nBodies: Int, totalIter: Int, view: ActorRef[ViewActor.Command]): Behavior[Command] =
+  def apply(nWorkers: Int, nBodies: Int, totalIter: Int, view: Option[ActorRef[ViewActor.Command]]): Behavior[Command] =
 
     var workers = Seq.empty[ActorRef[WorkerActor.Command]]
     val model: SimulationModel = new SimulationModel(nBodies, totalIter);
@@ -61,6 +61,7 @@ object Master:
             numberOfUpdatedVelocities = numberOfUpdatedVelocities + 1
             newBodies.addAll(result.bodies)
             if(numberOfUpdatedVelocities == nWorkers) then
+              println("velocità aggiornate")
               numberOfUpdatedVelocities = 0
               model.setBodies(newBodies)
               newBodies.clear()
@@ -74,11 +75,20 @@ object Master:
             numberOfUpdatedPositions = numberOfUpdatedPositions + 1
             newBodies.addAll(result.bodies)
             if(numberOfUpdatedPositions == nWorkers) then
+              println("posizioni aggiornate")
               numberOfUpdatedPositions = 0
               model.setBodies(newBodies)
               newBodies.clear()
-              view ! ViewActor.Command.UpdateView(model, context.self)
-              model.updateVirtualTime()
+              if !view.isEmpty then
+                view.get ! ViewActor.Command.UpdateView(model, context.self)
+                model.updateVirtualTime()
+              else
+                model.updateVirtualTime()
+                for
+                  w <- workers
+                  i = workers.indexOf(w)
+                  start = i * bodiesForWorker
+                yield w ! WorkerActor.UpdateVelocities(Task(new ArrayList(model.getBodies), start, bodiesForWorker, model.getBounds), context.self)
             Behaviors.same
         }
     }
