@@ -35,29 +35,14 @@ object Master:
                 i <- 1 to nWorkers
             } yield  context.spawn(WorkerActor(), "Worker" + i)
             if timer then chrono.start()
-            for
-              w <- workers
-              i = workers.indexOf(w)
-              start = i * bodiesForWorker
-            yield w ! WorkerActor.UpdateVelocities(Task(new ArrayList(model.getBodies), start, bodiesForWorker, model.getBounds), context.self)
+            sendUpdateVelocities(workers, model, bodiesForWorker, context.self)
             Behaviors.same
           case Stop =>
-            for
-              w <- workers
-            yield w ! WorkerActor.Command.Stop
+            sendStop(workers)
             Behaviors.stopped
           case ViewUpdated =>
-            if(model.getIter == totalIter) {
-              for
-                w <- workers
-              yield w ! WorkerActor.Command.Stop
-              Behaviors.stopped
-            }
-            for
-              w <- workers
-              i = workers.indexOf(w)
-              start = i * bodiesForWorker
-            yield w ! WorkerActor.UpdateVelocities(Task(new ArrayList(model.getBodies), start, bodiesForWorker, model.getBounds), context.self)
+            checkIterAndStop(workers, model.getIter, totalIter, Option.empty)
+            sendUpdateVelocities(workers, model, bodiesForWorker, context.self)
             Behaviors.same
           case VelocitiesUpdated(result) =>
             numberOfUpdatedVelocities = numberOfUpdatedVelocities + 1
@@ -84,20 +69,30 @@ object Master:
                 model.updateVirtualTime()
               else
                 model.updateVirtualTime()
-                if(model.getIter == totalIter) {
-                  for
-                    w <- workers
-                  yield w ! WorkerActor.Command.Stop
-                  val time = chrono.stop()
-                  println("Simulation time:" + time + " ms")
-                  Behaviors.stopped
-                }
-                for
-                  w <- workers
-                  i = workers.indexOf(w)
-                  start = i * bodiesForWorker
-                yield w ! WorkerActor.UpdateVelocities(Task(new ArrayList(model.getBodies), start, bodiesForWorker, model.getBounds), context.self)
+                checkIterAndStop(workers, model.getIter, totalIter, Option(chrono))
+                sendUpdateVelocities(workers, model, bodiesForWorker, context.self)
             Behaviors.same
         }
     }
 
+  def checkIterAndStop(workers: Seq[ActorRef[WorkerActor.Command]], currentIter: Long, maxIter: Int, chrono: Option[Chrono]): Unit =
+    if(currentIter == maxIter) {
+      sendStop(workers)
+
+      if !chrono.isEmpty then
+       val time = chrono.get.stop()
+        println("Simulation time:" + time + " ms")
+        Behaviors.stopped
+    }
+
+  def sendUpdateVelocities(workers: Seq[ActorRef[WorkerActor.Command]], model: SimulationModel, bodiesForWorker: Int, myself: ActorRef[Command]): Unit =
+    for
+      w <- workers
+      i = workers.indexOf(w)
+      start = i * bodiesForWorker
+    yield w ! WorkerActor.UpdateVelocities(Task(new ArrayList(model.getBodies), start, bodiesForWorker, model.getBounds), myself)
+
+  def sendStop(workers: Seq[ActorRef[WorkerActor.Command]]): Unit =
+    for
+      w <- workers
+    yield w ! WorkerActor.Command.Stop
