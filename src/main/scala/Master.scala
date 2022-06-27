@@ -19,7 +19,7 @@ object Master:
   def apply(nWorkers: Int, nBodies: Int, totalIter: Int, view: Option[ActorRef[ViewActor.Command]], timer: Boolean): Behavior[Command] =
 
     var workers = Seq.empty[ActorRef[WorkerActor.Command]]
-    val model: SimulationModel = new SimulationModel(nBodies, totalIter);
+    val model: SimulationModel = new SimulationModel(nBodies, totalIter)
     val bodiesForWorker = Math.ceil((nBodies / nWorkers).toDouble).toInt
     var numberOfUpdatedVelocities = 0
     var numberOfUpdatedPositions = 0
@@ -31,9 +31,9 @@ object Master:
         msg match {
           case Start =>
             model.init()
-            workers = for{
+            workers = for {
                 i <- 1 to nWorkers
-            } yield  context.spawn(WorkerActor(), "Worker" + i)
+            } yield context.spawn(WorkerActor(), "Worker" + i)
             if timer then chrono.start()
             sendUpdateVelocities(workers, model, bodiesForWorker, context.self)
             Behaviors.same
@@ -82,7 +82,7 @@ object Master:
       if !chrono.isEmpty then
        val time = chrono.get.stop()
         println("Simulation time:" + time + " ms")
-        Behaviors.stopped
+      Behaviors.stopped
     }
 
   def sendUpdateVelocities(workers: Seq[ActorRef[WorkerActor.Command]], model: SimulationModel, bodiesForWorker: Int, myself: ActorRef[Command]): Unit =
